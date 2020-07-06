@@ -63,3 +63,122 @@ FROM student s
 WHERE s.major 
 IN (select major from student) -- over here we are getting the list of major
 AND s.gpa >2;
+-- how you creat the composite primary key and set a foriegn key 
+CREATE TABLE client(
+client_id INT ,
+client_name VARCHAR(40),
+branch_id INT,
+PRIMARY KEY (client_id,client_name),
+FOREIGN KEY(branch_id) REFERENCES branch(branch_id) ON DELETE SET NULL);
+-- from employee the to the maximum paid employee
+SELECT * 
+FROM employee
+order by salary DESC 
+limit 1;
+-- all employee ordered by sex and their first name
+-- order by sex if they have the same sax then orer by first name 
+SELECT * 
+FROM employee
+ORDER BY SEX ,first_name;
+-- FIND THE DISTINCT BRANCHES OF THE EMPLOYEE
+SELECT distinct employee.branch_id  
+FROM employee ;
+-- sql Fanctions counting avg
+SELECT COUNT(emp_id) numberOfEmployee
+FROM employee;
+-- count the employee who are female
+select count(emp_id)
+from employee
+where sex ='F' ;
+-- find the avarage of all employee's salary;
+SELECT avg(salary) as theAvgSalary
+from employee;
+-- count function is diffeent from sum as sum is the sum of all column but cont it counts.
+select sum(salary) sumOfSalary
+from employee;
+-- the aggrigate funtion GROUP BY AS A KEY AND VALUE IN SQL LIKE MAP IN JAVA
+SELECT sex, COUNT(SEX) CONTSEXNUM
+FROM employee
+GROUP BY sex;
+-- LIST THE TOTAL SALES BY EVERY EMPLOYEE
+SELECT emp_id ,Sum(total_sales)
+FROM works_with
+group by emp_id;
+-- The wild card in sql  % = AMU #character
+SELECT *
+FROM client
+WHERE client_name LIKE '%LLC' or '%.com%' or client_id ='--0';-- a client withe end name LLC
+-- the union key word that union of two column form 2 column
+select first_name
+from employee
+union
+select client_name
+from client;
+-- Find a list of all money spent or earned by the company 
+select salary 
+from employee
+ union 
+ select total_sales
+ from works_with;
+ -- --------------------------------------------------------------------------------
+ -- Join key word ( display of multiple columns from two tables ) 
+--  insert into branch values(5,'university_village',100,null);
+-- ex Find all branches and the names of their managers.
+SELECT b.branch_id,b.branch_name,e.first_name as manager_name
+FROM  branch b  join  employee e 
+on e.emp_id = b.mgr_id;
+-- left join ( all at the left table and the mached columns in the left table )
+-- the concept of one to many is the same as this query , to use an order by is better if by uniquly identifed id
+SELECT e.emp_id,e.first_name as manager_name,b.branch_id,b.branch_name
+FROM  branch b left join  employee e 
+on e.emp_id = b.mgr_id
+order by e.emp_id;
+-- right join ( all the right table and columns matched on the left 
+SELECT b.branch_id,b.branch_name,e.first_name as manager_name
+FROM  branch b right join  employee e 
+on e.emp_id = b.mgr_id;
+-- --------------------------------------------------------------------------
+-- Nested query ()
+select * 
+from employee e
+where e.emp_id IN(
+select w.emp_id
+from works_with w
+where w.total_sales > 30000
+);
+-- more on sub query
+SELECT 	client.client_name
+	from client
+    where client.branch_id=(
+    select branch.branch_id
+    from branch
+    where branch.mgr_id = 102
+    );
+-- delete  on delet set null and on delet cascade 
+-- FREIGN KEY(branch_id) REFERENCES branch(branch_id) ON DELETE SET NULL
+delete from employee
+where emp_id =102;
+select * from branch;
+-- Trigger in sql (AOP Aspect oriented programming in sql ) which triggers  when  someting happen
+Delimiter $$ 
+create
+trigger my_trigger before insert
+on employee
+for each row begin
+ insert into trigger_test values('added new employee');
+ END$$
+ Delimiter ;
+ insert into employee values (109,'aaron','gezai','1967-11-17','M',22221000,null,2);
+select * from employee;
+-- DROP TRIGGER [ IF EXISTS ] [schema_name.]trigger_name 
+DROP TRIGGER company_database.trigger_test;
+
+ 
+ 
+
+
+
+
+
+
+
